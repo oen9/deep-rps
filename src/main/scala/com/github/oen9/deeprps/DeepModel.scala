@@ -1,7 +1,7 @@
 package com.github.oen9.deeprps
 
 import zio._
-import zio.console._
+import zio.logging._
 import cats.implicits._
 import zio.interop.catz.core._
 
@@ -47,9 +47,17 @@ object DeepModel {
     def loadImage(imgLoader: BaseImageLoader, img: File) = ZIO.effect(imgLoader.asMatrix(img))
     def feedForward(model: MultiLayerNetwork, img: INDArray) = model.feedForward(img).asScala.toVector
     def logResults(imgName: String, result: Vector[INDArray]) = for {
-      _ <- putStrLn(s"eval: $imgName")
-      _ <- putStrLn("paper \t\t rock \t\t scissors")
-      _ <- putStrLn(result.last.toFloatMatrix().toVector.map(_.toVector).flatten.mkString("\t"))
+      _ <- logInfo(s"eval: $imgName")
+      _ <- logInfo("     paper      rock  scissors")
+      _ <- logInfo(
+        result
+          .last
+          .toFloatMatrix()
+          .toVector
+          .map(_.toVector)
+          .flatten
+          .map(v => f"$v%10.3f")
+          .mkString(""))
     } yield ()
 
     def evalImg(model: MultiLayerNetwork, imgLoader: BaseImageLoader, img: File) = for {
@@ -83,20 +91,20 @@ object DeepModel {
     for {
       trainIter <- createDataIter(s"$trainPath/train/")
       testIter <- createDataIter(s"$trainPath/test/")
-      _ <- putStrLn(s"Labels: ${trainIter.getLabels()}")
+      _ <- logInfo(s"Labels: ${trainIter.getLabels()}")
       labelNum = trainIter.getLabels().size()
-      _ <- if (labelNum != 3) putStrLn("Warning! labels != 3") else ZIO.unit
+      _ <- if (labelNum != 3) logInfo("Warning! labels != 3") else ZIO.unit
 
-      _ <- putStrLn("Build model")
+      _ <- logInfo("Build model")
       model = buildModel(labelNum)
 
-      _ <- putStrLn("Train model...")
+      _ <- logInfo("Train model...")
       _ <- trainModel(model, trainIter, testIter)
 
-      _ <- putStrLn(s"Saving model to $savePath")
+      _ <- logInfo(s"Saving model to $savePath")
       _ <- ZIO.effect(model.save(new File(savePath), true))
 
-      _ <- putStrLn("Training finished")
+      _ <- logInfo("Training finished")
     } yield ()
   }
 

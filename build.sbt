@@ -14,15 +14,16 @@ lazy val root = (project in file("."))
       "org.deeplearning4j" % "deeplearning4j-core" % dl4jVersion,
       "org.nd4j" % "nd4j-native-platform" % dl4jVersion,
       "org.nd4j" % "nd4j-native" % dl4jVersion classifier "linux-x86_64-avx2",
+
       "org.typelevel" %% "cats-core" % "2.1.1",
       "dev.zio" %% "zio-interop-cats" % "2.0.0.0-RC11",
       "dev.zio" %% "zio" % zioVersion,
-      "dev.zio" %% "zio-macros-core" % zioMacrosVersion,
-      "dev.zio" %% "zio-macros-test" % zioMacrosVersion,
-      "com.github.scopt" %% "scopt" % "4.0.0-RC2",
+      "dev.zio" %% "zio-logging-slf4j" % "0.2.3",
+      //"dev.zio" %% "zio-macros-core" % zioMacrosVersion,
+      //"dev.zio" %% "zio-macros-test" % zioMacrosVersion,
 
-      "org.slf4j" % "slf4j-simple" % "1.7.25",
-      "org.slf4j" % "slf4j-api" % "1.7.25",
+      "com.github.scopt" %% "scopt" % "4.0.0-RC2",
+      "ch.qos.logback" % "logback-classic" % "1.2.3",
 
       "dev.zio" %% "zio-test" % zioVersion % Test,
       "dev.zio" %% "zio-test-sbt" % zioVersion % Test,
