@@ -4,9 +4,12 @@ import zio._
 import java.io.StringWriter
 import java.io.PrintWriter
 import com.github.oen9.deeprps.modules.pathProvider
+import com.github.oen9.deeprps.utils.fileUtil
 
 object Hello extends App {
-  type AppEnv = zio.console.Console with pathProvider.PathProvider
+  type AppEnv = zio.console.Console
+                  with pathProvider.PathProvider
+                  with fileUtil.FileUtil
 
   def run(args: List[String]): ZIO[ZEnv,Nothing,Int] =
     app(args)
@@ -16,7 +19,9 @@ object Hello extends App {
           e.printStackTrace(new PrintWriter(sw))
           zio.console.putStrLn(sw.toString())
       }
-      .provideCustomLayer(pathProvider.PathProvider.live)
+      .provideCustomLayer(
+        pathProvider.PathProvider.live ++
+        fileUtil.FileUtil.live)
       .fold(_ => 1, _ => 0)
 
   def app(args: List[String]): ZIO[AppEnv, Throwable, Unit] = for {

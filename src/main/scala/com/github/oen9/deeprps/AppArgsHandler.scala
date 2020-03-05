@@ -6,6 +6,7 @@ import zio._
 import zio.console._
 import com.github.oen9.deeprps.modules.pathProvider
 import java.io.File
+import com.github.oen9.deeprps.utils.fileUtil
 
 object AppArgsHandler {
   def handle(args: AppArgs) = for {
@@ -17,6 +18,8 @@ object AppArgsHandler {
   } yield ()
 
   def trainModel(trainData: File) = for {
+    cfgDir <- pathProvider.getCfgDir()
+    _ <- fileUtil.createDirectories(cfgDir)
     savePath <- pathProvider.getModelPath()
     _ <- ZIO.effect(DeepModel.trainAndSave(savePath, trainData.toString()))
   } yield  ()
