@@ -1,7 +1,12 @@
-package tpondertv
+package com.github.oen9.deeprps
+
+import cats.implicits._
+import java.io.File
 
 case class AppArgs(
   quit: Boolean = false,
+  eval: Vector[File] = Vector(),
+  trainDir: Option[File] = None,
 )
 
 class WrongAppArgsException(msg: String) extends Exception(msg)
@@ -22,6 +27,16 @@ object AppArgs {
       OParser.sequence(
         programName("deep-rps"),
         head("deep-rps", "0.0.1"),
+        opt[File]('e', "eval")
+          .unbounded()
+          .optional()
+          .valueName("<file>")
+          .action((x, c) => c.copy(eval = c.eval :+ x))
+          .text("image to eval"),
+        opt[File]('t', "train")
+          .valueName("<dir>")
+          .action((x, c) => c.copy(trainDir = x.some))
+          .text("dir with train and test subdirs"),
         help("help")
           .text("prints this usage text"),
         version("version")

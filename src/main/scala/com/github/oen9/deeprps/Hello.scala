@@ -1,13 +1,12 @@
-package com.github.oen9
+package com.github.oen9.deeprps
 
 import zio._
-import zio.console._
 import java.io.StringWriter
 import java.io.PrintWriter
-import tpondertv.AppArgs
+import com.github.oen9.deeprps.modules.pathProvider
 
 object Hello extends App {
-  type AppEnv = zio.console.Console
+  type AppEnv = zio.console.Console with pathProvider.PathProvider
 
   def run(args: List[String]): ZIO[ZEnv,Nothing,Int] =
     app(args)
@@ -17,15 +16,12 @@ object Hello extends App {
           e.printStackTrace(new PrintWriter(sw))
           zio.console.putStrLn(sw.toString())
       }
+      .provideCustomLayer(pathProvider.PathProvider.live)
       .fold(_ => 1, _ => 0)
 
   def app(args: List[String]): ZIO[AppEnv, Throwable, Unit] = for {
     appArgs <- ZIO.fromEither(AppArgs.parse(args))
     _ <- if (appArgs.quit) ZIO.unit
-         else handleAppArgs(appArgs)
-  } yield ()
-
-  def handleAppArgs(args: AppArgs) = for {
-    _ <- putStrLn("hello")
+         else AppArgsHandler.handle(appArgs)
   } yield ()
 }
