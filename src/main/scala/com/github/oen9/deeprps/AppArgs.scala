@@ -32,7 +32,7 @@ object AppArgs {
           .optional()
           .valueName("<file>")
           .action((x, c) => c.copy(eval = c.eval :+ x))
-          .text("image to eval"),
+          .text("image to eval (can be used few times to provide multiple files)"),
         opt[File]('t', "train")
           .valueName("<dir>")
           .action((x, c) => c.copy(trainDir = x.some))

@@ -7,10 +7,6 @@ import com.github.oen9.deeprps.modules.pathProvider
 import com.github.oen9.deeprps.utils.fileUtil
 
 object Hello extends App {
-  type AppEnv = zio.console.Console
-                  with pathProvider.PathProvider
-                  with fileUtil.FileUtil
-
   def run(args: List[String]): ZIO[ZEnv,Nothing,Int] =
     app(args)
       .flatMapError {
@@ -24,7 +20,7 @@ object Hello extends App {
         fileUtil.FileUtil.live)
       .fold(_ => 1, _ => 0)
 
-  def app(args: List[String]): ZIO[AppEnv, Throwable, Unit] = for {
+  def app(args: List[String]) = for {
     appArgs <- ZIO.fromEither(AppArgs.parse(args))
     _ <- if (appArgs.quit) ZIO.unit
          else AppArgsHandler.handle(appArgs)
