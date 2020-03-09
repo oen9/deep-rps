@@ -8,7 +8,6 @@ import zio.interop.catz.core._
 import java.io.File
 import org.datavec.image.recordreader.ImageRecordReader
 import org.datavec.api.split.FileSplit
-import org.datavec.image.loader.BaseImageLoader
 import org.datavec.api.io.labels.ParentPathLabelGenerator
 import org.datavec.image.transform.MultiImageTransform
 import org.datavec.image.transform.ShowImageTransform
@@ -30,6 +29,7 @@ import org.nd4j.linalg.learning.config.Adam
 import org.nd4j.linalg.activations.Activation
 import org.nd4j.linalg.lossfunctions.LossFunctions
 import org.nd4j.linalg.api.ndarray.INDArray
+import java.awt.image.BufferedImage
 
 object DeepModel {
   val seed = 12345L
@@ -39,13 +39,36 @@ object DeepModel {
   val nChannels = 3
   val nEpochs = 1
 
-  def evalFiles(loadModelPath: String, imgs: Vector[File]) = {
+  val outcomes: Vector[RpsType.RpsType] = Vector(RpsType.Paper, RpsType.Rock, RpsType.Scissors)
 
-    import scala.jdk.CollectionConverters._
-    def loadModel = ZIO.effect(MultiLayerNetwork.load(new File(loadModelPath), false))
-    def createImageLoader = ZIO.effect(new NativeImageLoader(height, width, nChannels))
-    def loadImage(imgLoader: BaseImageLoader, img: File) = ZIO.effect(imgLoader.asMatrix(img))
-    def feedForward(model: MultiLayerNetwork, img: INDArray) = model.feedForward(img).asScala.toVector
+  def evalBufferedImg(loadModelPath: String, bImg: BufferedImage) = { 
+    def loadImage(imgLoader: NativeImageLoader) = ZIO.effect(imgLoader.asMatrix(bImg))
+    def parseNetworkResult(nRes: Vector[INDArray]) = for { 
+      partialResults <- nRes
+        .last
+        .toFloatMatrix
+        .toVector
+        .map(_.toVector)
+        .flatten
+        .zip(outcomes)
+        .traverse(v => {logInfo(s"${v._1} <- ${v._2}") as v})
+      finalResult = partialResults
+        .maxBy(_._1)
+        ._2
+    } yield finalResult
+
+    for {
+      _ <- logDebug("eval bufferedImage")
+      model <- loadModel(loadModelPath)
+      imgLoader <- createImageLoader
+      loadedImg <- loadImage(imgLoader)
+      networkResult = feedForward(model, loadedImg)
+      evalResult <- parseNetworkResult(networkResult)
+    } yield evalResult
+  }
+
+  def evalFiles(loadModelPath: String, imgs: Vector[File]) = {
+    def loadImage(imgLoader: NativeImageLoader, img: File) = ZIO.effect(imgLoader.asMatrix(img))
     def logResults(imgName: String, result: Vector[INDArray]) = for {
       _ <- logInfo(s"eval: $imgName")
       _ <- logInfo("     paper      rock  scissors")
@@ -60,14 +83,14 @@ object DeepModel {
           .mkString(""))
     } yield ()
 
-    def evalImg(model: MultiLayerNetwork, imgLoader: BaseImageLoader, img: File) = for {
+    def evalImg(model: MultiLayerNetwork, imgLoader: NativeImageLoader, img: File) = for {
       loadedImg <- loadImage(imgLoader, img)
       result = feedForward(model, loadedImg)
       _ <- logResults(img.getName(), result)
     } yield ()
 
     for {
-      model <- loadModel
+      model <- loadModel(loadModelPath)
       imgLoader <- createImageLoader
       _ <- imgs.traverse(f => evalImg(model, imgLoader, f))
     } yield ()
@@ -93,7 +116,7 @@ object DeepModel {
       testIter <- createDataIter(s"$trainPath/test/")
       _ <- logInfo(s"Labels: ${trainIter.getLabels()}")
       labelNum = trainIter.getLabels().size()
-      _ <- if (labelNum != 3) logInfo("Warning! labels != 3") else ZIO.unit
+      _ <- if (labelNum != 3) logWarn("Warning! labels != 3") else ZIO.unit
 
       _ <- logInfo("Build model")
       model = buildModel(labelNum)
@@ -158,5 +181,12 @@ object DeepModel {
         .build())
       .setInputType(InputType.convolutionalFlat(height, width, nChannels)) 
       .build();
+  }
+
+  private def loadModel(loadModelPath: String): Task[MultiLayerNetwork] = ZIO.effect(MultiLayerNetwork.load(new File(loadModelPath), false))
+  private def createImageLoader: Task[NativeImageLoader] = ZIO.effect(new NativeImageLoader(height, width, nChannels))
+  private def feedForward(model: MultiLayerNetwork, img: INDArray): Vector[INDArray] = { // result:    paper <-> rock <-> scissors
+    import scala.jdk.CollectionConverters._
+    model.feedForward(img).asScala.toVector
   }
 }

@@ -20,6 +20,6 @@ object Hello extends App {
     _ <- logInfo("App started")
     appArgs <- ZIO.fromEither(AppArgs.parse(args))
     _ <- if (appArgs.quit) ZIO.unit
-         else AppArgsHandler.handle(appArgs)
+         else AppArgsHandler.handle(appArgs, unsafeRunSync[Throwable, RpsType.RpsType](_))
   } yield ()
 }

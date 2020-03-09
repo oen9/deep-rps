@@ -7,6 +7,7 @@ case class AppArgs(
   quit: Boolean = false,
   eval: Vector[File] = Vector(),
   trainDir: Option[File] = None,
+  gui: Boolean = false,
 )
 
 class WrongAppArgsException(msg: String) extends Exception(msg)
@@ -27,6 +28,9 @@ object AppArgs {
       OParser.sequence(
         programName("deep-rps"),
         head("deep-rps", "0.0.1"),
+        opt[Unit]('x', "x-gui")
+          .action((_, c) => c.copy(gui = true))
+          .text("run GUI"),
         opt[File]('e', "eval")
           .unbounded()
           .optional()
