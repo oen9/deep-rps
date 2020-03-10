@@ -39,18 +39,16 @@ object DeepModel {
   val nChannels = 3
   val nEpochs = 1
 
-  val outcomes: Vector[RpsType.RpsType] = Vector(RpsType.Paper, RpsType.Rock, RpsType.Scissors)
-
-  def evalBufferedImg(loadModelPath: String, bImg: BufferedImage) = { 
+  def evalBufferedImg(loadModelPath: String, bImg: BufferedImage) = {
     def loadImage(imgLoader: NativeImageLoader) = ZIO.effect(imgLoader.asMatrix(bImg))
-    def parseNetworkResult(nRes: Vector[INDArray]) = for { 
+    def parseNetworkResult(nRes: Vector[INDArray]) = for {
       partialResults <- nRes
         .last
         .toFloatMatrix
         .toVector
         .map(_.toVector)
         .flatten
-        .zip(outcomes)
+        .zip(RpsType.outcomes)
         .traverse(v => {logInfo(s"${v._1} <- ${v._2}") as v})
       finalResult = partialResults
         .maxBy(_._1)
@@ -179,7 +177,7 @@ object DeepModel {
         .nOut(labelNum)
         .activation(Activation.SOFTMAX)
         .build())
-      .setInputType(InputType.convolutionalFlat(height, width, nChannels)) 
+      .setInputType(InputType.convolutionalFlat(height, width, nChannels))
       .build();
   }
 
