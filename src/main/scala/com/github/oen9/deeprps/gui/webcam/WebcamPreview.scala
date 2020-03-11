@@ -1,4 +1,4 @@
-package com.github.oen9.deeprps.gui.nodes
+package com.github.oen9.deeprps.gui.webcam
 
 import scalafx.Includes._
 import scalafx.scene.canvas.Canvas
@@ -21,13 +21,21 @@ object WebcamPreview {
             selectionRect.width() = 0
             selectionRect.height() = 0
           case MouseEvent.MouseDragged =>
-            selectionRect.width() = me.x - selectionRect.x()
-            selectionRect.height() = me.y - selectionRect.y()
+            val newWidth = me.x - selectionRect.x()
+            val scaledWidth = baseImg().width() / scale
+            selectionRect.width() = if (me.x < scaledWidth) newWidth else scaledWidth - selectionRect.x()
+
+            val newHeight = me.y - selectionRect.y()
+            val scaledHeight = baseImg().height() / scale
+            selectionRect.height() = if (me.y < scaledHeight) newHeight else scaledHeight - selectionRect.y()
             drawWebcamPreview(graphicsContext2D)
+
           case _ => {}
         }
       }
     }
+
+    def scale = baseImg().width() / width()
 
     def drawWebcamPreview(gc: GraphicsContext) = {
       gc.clearRect(0, 0, width.get, width.get)

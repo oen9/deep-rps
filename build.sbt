@@ -22,6 +22,7 @@ lazy val root = (project in file("."))
       "org.deeplearning4j" % "deeplearning4j-core" % dl4jVersion,
       "org.nd4j" % "nd4j-native-platform" % dl4jVersion,
       "org.nd4j" % "nd4j-native" % dl4jVersion classifier "linux-x86_64-avx2",
+      "org.bytedeco" % "javacv-platform" % "1.5.2",
 
       "org.typelevel" %% "cats-core" % "2.1.1",
       "dev.zio" %% "zio-interop-cats" % "2.0.0.0-RC11",
