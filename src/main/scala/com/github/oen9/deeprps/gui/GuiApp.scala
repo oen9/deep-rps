@@ -29,6 +29,7 @@ import scalafx.beans.binding.Bindings
 import javafx.scene.paint.Paint
 import com.github.oen9.deeprps.gui.geometry.Rect
 import com.github.oen9.deeprps.gui.nodes.WebcamPreview
+import scalafx.beans.property.ObjectProperty
 
 object GuiApp {
   def run(evalImg: BufferedImage => Exit[Throwable, RpsType.RpsType]) = {
@@ -40,13 +41,8 @@ object GuiApp {
     val rockImg = new Image(getClass().getResourceAsStream("/img/rps/rock.png"))
     val paperImg = new Image(getClass().getResourceAsStream("/img/rps/paper.png"))
     val scissorsImg = new Image(getClass().getResourceAsStream("/img/rps/scissors.png"))
-    val webcamFakePreviewImg = new Image(
-      getClass().getResourceAsStream("/img/rps/webcam-fake-preview.jpg"),
-      requestedWidth = imgWidth,
-      requestedHeight = imgHeight,
-      preserveRatio = true,
-      smooth = true
-    )
+    val webcamFakePreviewImg = new Image(getClass().getResourceAsStream("/img/rps/webcam-fake-preview.jpg"))
+    val webcamPreviewImg = ObjectProperty[Image](webcamFakePreviewImg)
 
     val botImgView = new ImageView(rockImg) {
       preserveRatio = true
@@ -63,10 +59,9 @@ object GuiApp {
       preserveRatio = true
       fitHeight = imgHeight
       fitWidth = imgWidth
-      viewport = selectionRect.to2D()
     }
 
-    val canvas = WebcamPreview(imgWidth, imgHeight, selectionRect, webcamFakePreviewImg)
+    val canvas = WebcamPreview(imgWidth, imgHeight, selectionRect, webcamPreviewImg)
 
     val jfxApp = new JFXApp {
       val evalResultLabel = new Label("paper") {
@@ -97,11 +92,11 @@ object GuiApp {
 
       val playButton = new Button("play!") {
         onAction = { _ =>
-          playerImgView.viewport = selectionRect.to2D()
           val snapProp = new SnapshotParameters {
             viewport = selectionRect.to2DWithShift(canvas)
           }
           val playerImg = canvas.snapshot(snapProp, null)
+          playerImgView.image = playerImg
 
           GameLogic
             .handlePlay(gameState, playerImg, evalImg)

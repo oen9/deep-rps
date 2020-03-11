@@ -3,7 +3,7 @@ ThisBuild / version          := "0.1.0-SNAPSHOT"
 ThisBuild / organization     := "com.github.oen9"
 ThisBuild / organizationName := "oen9"
 
-val zioVersion = "1.0.0-RC18-1"
+val zioVersion = "1.0.0-RC18"
 val zioMacrosVersion = "0.6.2"
 val dl4jVersion = "1.0.0-beta6"
 

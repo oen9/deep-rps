@@ -30,7 +30,7 @@ object AppArgs {
         head("deep-rps", "0.0.1"),
         opt[Unit]('x', "x-gui")
           .action((_, c) => c.copy(gui = true))
-          .text("run GUI"),
+          .text("run game with GUI"),
         opt[File]('e', "eval")
           .unbounded()
           .optional()
