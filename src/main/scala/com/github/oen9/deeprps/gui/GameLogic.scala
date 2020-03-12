@@ -10,6 +10,14 @@ import zio.Exit._
 import zio.Cause
 
 object GameLogic {
+  def handlePreview(playerImg: WritableImage, evalImg: BufferedImage => Exit[Throwable, RpsType]): com.github.oen9.deeprps.RpsType.RpsType = {
+    val bufferedImage = SwingFXUtils.fromFXImage(playerImg, null)
+    evalImg(bufferedImage) match {
+      case Failure(cause) => com.github.oen9.deeprps.RpsType.Paper
+      case Success(playerChoice) => playerChoice
+    }
+  }
+
   def handlePlay(gameState: GameState, playerImg: WritableImage, evalImg: BufferedImage => Exit[Throwable, RpsType]): Option[Cause[Throwable]] = {
     gameState.botChoice() = outcomes(Random.nextInt(3))
 

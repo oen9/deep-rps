@@ -18,16 +18,21 @@ object WebcamPreview {
           case MouseEvent.MousePressed =>
             selectionRect.x() = me.x
             selectionRect.y() = me.y
-            selectionRect.width() = 0
-            selectionRect.height() = 0
+            selectionRect.width() = 1
+            selectionRect.height() = 1
           case MouseEvent.MouseDragged =>
             val newWidth = me.x - selectionRect.x()
             val scaledWidth = baseImg().width() / scale
-            selectionRect.width() = if (me.x < scaledWidth) newWidth else scaledWidth - selectionRect.x()
+            selectionRect.width() =
+              if (me.x < scaledWidth && selectionRect.x() < me.x) newWidth
+              else selectionRect.width()
 
             val newHeight = me.y - selectionRect.y()
             val scaledHeight = baseImg().height() / scale
-            selectionRect.height() = if (me.y < scaledHeight) newHeight else scaledHeight - selectionRect.y()
+            selectionRect.height() =
+              if (me.y < scaledHeight && selectionRect.y() < me.y) newHeight
+              else selectionRect.height()
+
             drawWebcamPreview(graphicsContext2D)
 
           case _ => {}

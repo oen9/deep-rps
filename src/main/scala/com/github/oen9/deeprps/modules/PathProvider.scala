@@ -17,7 +17,7 @@ object pathProvider {
       def getModelPath(): IO[Throwable, String]
     }
 
-    val live: ZLayer[System, Nothing, PathProvider] = ZLayer.fromFunction { system => 
+    val live: ZLayer[System, Nothing, PathProvider] = ZLayer.fromFunction { system =>
       new Service {
         val cfgDir = "/.deep-rps"
         val modelName = "/model.zip"
