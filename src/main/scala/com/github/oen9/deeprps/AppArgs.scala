@@ -40,7 +40,7 @@ object AppArgs {
         opt[File]('t', "train")
           .valueName("<dir>")
           .action((x, c) => c.copy(trainDir = x.some))
-          .text("train network w ith provided dir with train and test subdirs"),
+          .text("train network with provided dir with train and test subdirs"),
         help("help")
           .text("prints this usage text"),
         version("version")

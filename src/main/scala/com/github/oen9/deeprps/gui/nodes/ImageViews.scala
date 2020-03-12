@@ -12,8 +12,6 @@ trait ImageViews {
     preserveRatio = true
     fitHeight = imgWidth
     fitWidth = imgHeight
-    println("gamestate: " + gameState)
-    println("rockImg: " + rockImg)
     image <== Bindings.createObjectBinding[JImage](() => gameState.botChoice() match {
       case Rock => rockImg
       case Paper => paperImg

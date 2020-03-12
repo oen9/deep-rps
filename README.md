@@ -33,7 +33,7 @@ Usage: deep-rps [options]
 
   -x, --x-gui        run game with GUI
   -e, --eval <file>  image to eval (can be used few times to provide multiple files)
-  -t, --train <dir>  train network w ith provided dir with train and test subdirs
+  -t, --train <dir>  train network with provided dir with train and test subdirs
   --help             prints this usage text
   --version          prints app version
 ```
