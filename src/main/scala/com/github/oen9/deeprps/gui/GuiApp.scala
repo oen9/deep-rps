@@ -26,6 +26,7 @@ object GuiApp {
       override def stopApp(): Unit = nodes.webcamService.cancel()
 
       stage = new PrimaryStage {
+        icons.add(nodes.rockImg)
         title = "rock paper scissors"
         height = 600
         width = 600

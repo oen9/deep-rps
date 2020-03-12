@@ -27,7 +27,7 @@ object AppArgs {
       import builder._
       OParser.sequence(
         programName("deep-rps"),
-        head("deep-rps", "0.0.1"),
+        head("deep-rps", "0.0.2"),
         opt[Unit]('x', "x-gui")
           .action((_, c) => c.copy(gui = true))
           .text("run game with GUI"),
@@ -40,7 +40,7 @@ object AppArgs {
         opt[File]('t', "train")
           .valueName("<dir>")
           .action((x, c) => c.copy(trainDir = x.some))
-          .text("dir with train and test subdirs"),
+          .text("train network w ith provided dir with train and test subdirs"),
         help("help")
           .text("prints this usage text"),
         version("version")
