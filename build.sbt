@@ -21,7 +21,7 @@ lazy val root = (project in file("."))
     name := "deep-rps",
     libraryDependencies ++= Seq(
       "org.deeplearning4j" % "deeplearning4j-core" % dl4jVersion,
-      "org.nd4j" % "nd4j-native-platform" % dl4jVersion classifier "linux-x86_64",
+      "org.nd4j" % "nd4j-native" % dl4jVersion,
       "org.nd4j" % "nd4j-native" % dl4jVersion classifier "linux-x86_64-avx2",
       //"org.bytedeco" % "javacv-platform" % "1.5.2",
       "org.bytedeco.javacpp-presets" % "opencv" % "4.0.1-1.4.4" classifier "linux-x86_64",
@@ -51,5 +51,13 @@ lazy val root = (project in file("."))
       "-Ymacro-annotations"
     ),
     mappings.in(Universal, packageZipTarball) ++= Seq(file(sys.env.get("HOME").get + "/.deep-rps/model.zip") -> "model.zip"),
+    universalArchiveOptions.in(Universal, packageZipTarball) := (Seq(
+      "--exclude", "*windows*",
+      "--exclude", "*android*",
+      "--exclude", "*macosx*",
+      "--exclude", "*ios*",
+      "--exclude", "*arm*",
+      "--exclude", "*ppc*",
+    ) ++ (universalArchiveOptions.in(Universal, packageZipTarball)).value),
   )
   .enablePlugins(JavaAppPackaging)
