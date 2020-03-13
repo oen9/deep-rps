@@ -2,6 +2,7 @@ ThisBuild / scalaVersion     := "2.13.1"
 ThisBuild / version          := "0.0.2-SNAPSHOT"
 ThisBuild / organization     := "com.github.oen9"
 ThisBuild / organizationName := "oen9"
+maintainer                   := "oen.ult@gmail.com"
 
 val zioVersion = "1.0.0-RC18"
 val zioMacrosVersion = "0.6.2"
@@ -20,9 +21,10 @@ lazy val root = (project in file("."))
     name := "deep-rps",
     libraryDependencies ++= Seq(
       "org.deeplearning4j" % "deeplearning4j-core" % dl4jVersion,
-      "org.nd4j" % "nd4j-native-platform" % dl4jVersion,
+      "org.nd4j" % "nd4j-native-platform" % dl4jVersion classifier "linux-x86_64",
       "org.nd4j" % "nd4j-native" % dl4jVersion classifier "linux-x86_64-avx2",
-      "org.bytedeco" % "javacv-platform" % "1.5.2",
+      //"org.bytedeco" % "javacv-platform" % "1.5.2",
+      "org.bytedeco.javacpp-presets" % "opencv" % "4.0.1-1.4.4" classifier "linux-x86_64",
 
       "org.typelevel" %% "cats-core" % "2.1.1",
       "dev.zio" %% "zio-interop-cats" % "2.0.0.0-RC11",
@@ -48,5 +50,6 @@ lazy val root = (project in file("."))
       "-language:higherKinds",
       "-Ymacro-annotations"
     ),
+    mappings.in(Universal, packageZipTarball) ++= Seq(file(sys.env.get("HOME").get + "/.deep-rps/model.zip") -> "model.zip"),
   )
   .enablePlugins(JavaAppPackaging)

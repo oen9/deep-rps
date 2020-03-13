@@ -36,8 +36,8 @@ object DeepModel {
   val randNumGen = new java.util.Random(seed)
   val width = 28
   val height = 28
-  val nChannels = 3
-  val nEpochs = 1
+  val nChannels = 1
+  val nEpochs = 3
 
   def evalBufferedImg(loadModelPath: String, bImg: BufferedImage) = {
     def loadImage(imgLoader: NativeImageLoader) = ZIO.effect(imgLoader.asMatrix(bImg))
